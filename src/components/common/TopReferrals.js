@@ -9,23 +9,58 @@ import {
   CardFooter,
   Row,
   Col,
-  FormSelect
+  FormSelect,
+  Button
 } from "shards-react";
 
-const TopReferrals = ({ title, referralData }) => (
-  <Card small>
+
+class TopReferrals extends React.Component {
+      
+  constructor(props) {
+    super(props);
+    this.state = {
+      items: []
+    };
+  }
+
+  componentDidMount(){
+    this.getTagsFromDb();
+  }
+
+  getTagsFromDb = () =>{
+    fetch("http://127.0.0.1:8000/get-dim/get-tags/")
+      .then(res => res.json())
+      .then((result) => this.setState({items:result}))
+  }
+
+  refreshTags = () =>{
+      let result = window.confirm('This will cost additional 0.01$. Do you want to proceed?');
+
+      if(result){
+        fetch('http://127.0.0.1:8000/get-dim/tags/')
+        .then(res => res.json())
+        .then((data) => {
+          this.getTagsFromDb();
+        })
+      }
+  }
+
+  render(){
+    return(
+      <Card small>
     <CardHeader className="border-bottom">
-      <h6 className="m-0">{title}</h6>
-      <div className="block-handle" />
+      <Row>
+      <Col><h6 className="m-0">Fetched Tags</h6></Col>
+      <Col><Button theme="accent" onClick={this.refreshTags}>Refresh Tags</Button></Col></Row>
     </CardHeader>
 
     <CardBody className="p-0">
       <ListGroup small flush className="list-group-small">
-        {referralData.map((item, idx) => (
+        {this.state.items.map((item, idx) => (
           <ListGroupItem key={idx} className="d-flex px-3">
-            <span className="text-semibold text-fiord-blue">{item.title}</span>
+            <span className="text-semibold text-fiord-blue">{item.value}</span>
             <span className="ml-auto text-right text-semibold text-reagent-gray">
-              {item.value}
+              {item.key}
             </span>
           </ListGroupItem>
         ))}
@@ -34,78 +69,65 @@ const TopReferrals = ({ title, referralData }) => (
 
     <CardFooter className="border-top">
       <Row>
-        {/* Time Span */}
-        <Col>
-          <FormSelect
-            size="sm"
-            value="last-week"
-            style={{ maxWidth: "130px" }}
-            onChange={() => {}}
-          >
-            <option value="last-week">Last Week</option>
-            <option value="today">Today</option>
-            <option value="last-month">Last Month</option>
-            <option value="last-year">Last Year</option>
-          </FormSelect>
-        </Col>
-
         {/* View Full Report */}
         <Col className="text-right view-report">
           {/* eslint-disable-next-line */}
-          <a href="#">Full report &rarr;</a>
+          <a href="#">Full Tag list &rarr;</a>
         </Col>
       </Row>
     </CardFooter>
   </Card>
-);
+    );
+  }
+}
 
-TopReferrals.propTypes = {
-  /**
-   * The component's title.
-   */
-  title: PropTypes.string,
-  /**
-   * The referral data.
-   */
-  referralData: PropTypes.array
-};
+// TopReferrals.propTypes = {
+//   /**
+//    * The component's title.
+//    */
+//   title: PropTypes.string,
+//   /**
+//    * The referral data.
+//    */
+//   referralData: PropTypes.array
+// };
 
-TopReferrals.defaultProps = {
-  title: "Top Referrals",
-  referralData: [
-    {
-      title: "GitHub",
-      value: "19,291"
-    },
-    {
-      title: "Stack Overflow",
-      value: "11,201"
-    },
-    {
-      title: "Hacker News",
-      value: "9,291"
-    },
-    {
-      title: "Reddit",
-      value: "8,281"
-    },
-    {
-      title: "The Next Web",
-      value: "7,128"
-    },
-    {
-      title: "Tech Crunch",
-      value: "6,218"
-    },
-    {
-      title: "YouTube",
-      value: "1,218"
-    },
-    {
-      title: "Adobe",
-      value: "1,171"
-    }
-  ]
-};
+// TopReferrals.defaultProps = {
+//   title: "Tags fetched",
+//   referralData: [
+//     {
+//       title: "GitHub",
+//       value: "19,291"
+//     },
+//     {
+//       title: "Stack Overflow",
+//       value: "11,201"
+//     },
+//     {
+//       title: "Hacker News",
+//       value: "9,291"
+//     },
+//     {
+//       title: "Reddit",
+//       value: "8,281"
+//     },
+//     {
+//       title: "The Next Web",
+//       value: "7,128"
+//     },
+//     {
+//       title: "Tech Crunch",
+//       value: "6,218"
+//     },
+//     {
+//       title: "YouTube",
+//       value: "1,218"
+//     },
+//     {
+//       title: "Adobe",
+//       value: "1,171"
+//     }
+//   ]
+// };
 
 export default TopReferrals;
